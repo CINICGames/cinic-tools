@@ -244,6 +244,10 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 			UpdateReferences();
 			UpdateCommit();
 			manualChange = false;
+		} else {
+			EditorUtility.DisplayDialog("Wrong Format", "Version must be in format *.*.*", "Ok");
+			manualVersion = PlayerSettings.bundleVersion;
+			GUI.FocusControl(null);
 		}
 	}
 	
