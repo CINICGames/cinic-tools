@@ -105,8 +105,7 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 
 			int newIndex = EditorGUILayout.Popup("Branch", selectedIndex, commands.Branches);
 			if (newIndex != selectedIndex) {
-				selectedIndex = newIndex;
-				ValidateBranch(commands.Branches[selectedIndex]);
+				ValidateBranch(newIndex);
 			}
 
 			// Draw version upgrade
@@ -268,15 +267,17 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 		return Regex.IsMatch(toValidate, regexPattern);
 	}
 
-	private void ValidateBranch(string toValidate) {
-		if (toValidate == commands.BuildBranch) {
+	private void ValidateBranch(int toValidate) {
+		if (commands.Branches[toValidate] == commands.BuildBranch) {
 			if (EditorUtility.DisplayDialog("Push Official Build",
 				$"Confirm you want to push in {commands.BuildBranch} branch?",
 				"Ok", "No")) {
 				branch = commands.BuildBranch;
+				selectedIndex = 1;
 				return;
 			}
 			branch = commands.PlaytestBranch;
+			selectedIndex = 0;
 		}
 	}
 
