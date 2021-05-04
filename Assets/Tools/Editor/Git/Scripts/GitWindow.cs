@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 // using Sirenix.OdinInspector;
@@ -13,14 +14,13 @@ using UnityEngine;
 
 public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 	public enum VersionUpdate {
-		Major,
-		Minor,
-		Patch
+		Major = 0,
+		Minor = 1,
+		Patch = 2
 	}
 
-	private string[] branches;
-
-	private const string CommandsPath = "Assets/Data/Editor/git_commands.asset";
+	private const string CommandsLocation = "Assets/Data/Editor/";
+	private const string CommandsFileName = "git_commands.asset";
 	
 	// [OnInspectorGUI, PropertyOrder(0)]
 	private void Title() {
@@ -33,7 +33,8 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 
 	// [PropertyOrder(1), ValueDropdown(nameof(branches)), OnValueChanged(nameof(ValidateBranch)), ShowIf(nameof(canPush))]
 	public string branch = "playtest";
-	
+	private int selectedIndex = 0;
+
 	// [ShowIf(nameof(canPush)), HorizontalGroup("Automatic"), PropertyOrder(2), OnValueChanged(nameof(UpdateCommit))]
 	// [LabelWidth(110)]
 	public bool upgradeVersion = true;
@@ -69,21 +70,91 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 		var window = GetWindow<GitWindow>();
 		// window.position = GUIHelper.GetEditorWindowRect().AlignCenter(500, 240);
 		window.Init();
+		window.minSize = new Vector2(500, 500);
+		window.maxSize = new Vector2(500, 500);
 		Git.RunGitCommand("fetch origin");
-
 	}
 
 	private void Init() {
-		commands = AssetDatabase.LoadAssetAtPath<GitCommands>(CommandsPath);
+		string commandsPath = Path.Combine(CommandsLocation, CommandsFileName);
+		commands = AssetDatabase.LoadAssetAtPath<GitCommands>(commandsPath);
+		// If no asset found create it
+		if (commands == null) {
+			commands = CreateInstance<GitCommands>();
+			Directory.CreateDirectory(CommandsLocation);
+			AssetDatabase.CreateAsset(commands, commandsPath);
+			EditorUtility.SetDirty(commands);
+			AssetDatabase.SaveAssets();
+		}
+		
 		branch = commands.PlaytestBranch;
-		branches = new[] {commands.PlaytestBranch, commands.BuildBranch};
 		UpdateReferences();
 		commitMessage = $"Version Upgrade: {VersionPreview()}";
 	}
 
+	private void OnGUI() {
+		Title();
+		
+		if (canPush) {
+			GUI.enabled = false;
+			EditorGUILayout.Space();
+			EditorGUILayout.ObjectField("Commands", commands, typeof(GitCommands), false);
+			GUI.enabled = true;
+
+			selectedIndex = EditorGUILayout.Popup("Branch", selectedIndex, commands.Branches);
+			branch = commands.Branches[selectedIndex];
+
+			// Draw version upgrade
+			Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+			var toggleRect = new Rect(rect.x, rect.y, rect.width / 2, rect.height);
+			var toolbarRect = new Rect(rect.x + rect.width / 2, rect.y, rect.width / 2, rect.height);
+			upgradeVersion = EditorGUI.Toggle(toggleRect,"Upgrade Version", upgradeVersion);
+			if (upgradeVersion) {
+				manualChange = false;
+				version = (VersionUpdate) GUI.Toolbar(toolbarRect, (int) version, Enum.GetNames(typeof(VersionUpdate)));
+				UpdateCommit();
+			}
+			
+			// Draw manual version upgrade
+			rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+			toggleRect = new Rect(rect.x, rect.y, rect.width / 2, rect.height);
+			var textRect = new Rect(rect.x + rect.width / 2, rect.y, rect.width / 4, rect.height);
+			var buttonRect = new Rect(rect.x + rect.width * 3/4, rect.y, rect.width / 4, rect.height);
+			manualChange = EditorGUI.Toggle(toggleRect,"Manual", manualChange);
+			if (manualChange) {
+				upgradeVersion = false;
+				manualVersion = EditorGUI.TextField(textRect, manualVersion);
+				if (GUI.Button(buttonRect, "Change")) {
+					ManualVersionChange();
+				}
+			}
+			
+			// Commit message
+			GUI.enabled = false;
+			EditorGUILayout.TextField("Commit message", commitMessage);
+			GUI.enabled = true;
+			
+			// Try build
+			EditorGUILayout.Space();
+			rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
+			buttonRect = new Rect(rect.x, rect.y, rect.width / 4, rect.height);
+			var colorRect = new Rect(rect.x + rect.width / 4 + 10, rect.y, rect.height, rect.height);
+			if (GUI.Button(buttonRect, "Try Build")) {
+				TryBuild();
+			}
+			EditorGUI.DrawRect(colorRect, GetColor());
+			
+			// Execute
+			EditorGUILayout.Space();
+			if (GUILayout.Button("Execute")) {
+				Execute();
+			}
+		}
+	}
+
 	private void UpdateReferences() {
 		currentBranch = Git.GetCurrentBranchName();
-		manualVersion = PlayerSettings.bundleVersion;
+		manualVersion = VersionPreview();
 		canPush = CheckIfCanPush(out dynamicTitle);
 	}
 
@@ -204,24 +275,29 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 	}
 
 	private string VersionPreview() {
-		int major, minor, patch;
-		string currentVersion = PlayerSettings.bundleVersion;
-		major = Convert.ToInt32(currentVersion.Split('.')[0]);
-		minor = Convert.ToInt32(currentVersion.Split('.')[1]);
-		patch = Convert.ToInt32(currentVersion.Split('.')[2]);
-		if (version == VersionUpdate.Major) {
+		string[] versionParts = PlayerSettings.bundleVersion.Split('.');
+		
+		// Get version if valid, fix it otherwise
+		int major = versionParts.Length > 0 ? Convert.ToInt32(versionParts[0]) : 0;
+		int minor = versionParts.Length > 1 ? Convert.ToInt32(versionParts[1]) : 0;
+		int patch = versionParts.Length > 2 ? Convert.ToInt32(versionParts[2]) : 0;
+		
+		switch (version) {
+		case VersionUpdate.Major:
 			major++;
 			minor = 0;
 			patch = 0;
-		}
-		else if (version == VersionUpdate.Minor) {
+			break;
+		case VersionUpdate.Minor:
 			minor++;
 			patch = 0;
-		}
-		else if (version == VersionUpdate.Patch) {
+			break;
+		case VersionUpdate.Patch:
 			patch++;
+			break;
 		}
-		return string.Format("{0}.{1}.{2}", major, minor, patch);
+		
+		return $"{major}.{minor}.{patch}";
 	}
 	
 	// [PropertySpace(10), Button, PropertyOrder(4), HorizontalGroup("TryBuild"), ShowIf("@canPush")]
