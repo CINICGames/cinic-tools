@@ -21,7 +21,9 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 
 	private const string CommandsLocation = "Assets/Data/Editor/";
 	private const string CommandsFileName = "git_commands.asset";
-	
+
+	private static readonly Vector2 WindowSize = new Vector2(500, 205);
+
 	// [OnInspectorGUI, PropertyOrder(0)]
 	private void Title() {
 		EditorUtilities.DrawTitle(dynamicTitle, 15, 5);
@@ -70,8 +72,8 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 		var window = GetWindow<GitWindow>();
 		// window.position = GUIHelper.GetEditorWindowRect().AlignCenter(500, 240);
 		window.Init();
-		window.minSize = new Vector2(500, 500);
-		window.maxSize = new Vector2(500, 500);
+		window.minSize = WindowSize;
+		window.maxSize = WindowSize;
 		Git.RunGitCommand("fetch origin");
 	}
 
@@ -101,8 +103,11 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 			EditorGUILayout.ObjectField("Commands", commands, typeof(GitCommands), false);
 			GUI.enabled = true;
 
-			selectedIndex = EditorGUILayout.Popup("Branch", selectedIndex, commands.Branches);
-			branch = commands.Branches[selectedIndex];
+			int newIndex = EditorGUILayout.Popup("Branch", selectedIndex, commands.Branches);
+			if (newIndex != selectedIndex) {
+				selectedIndex = newIndex;
+				ValidateBranch(commands.Branches[selectedIndex]);
+			}
 
 			// Draw version upgrade
 			Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
@@ -142,7 +147,8 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 			if (GUI.Button(buttonRect, "Try Build")) {
 				TryBuild();
 			}
-			EditorGUI.DrawRect(colorRect, GetColor());
+			
+			EditorGUI.DrawRect(colorRect, buildResult);
 			
 			// Execute
 			EditorGUILayout.Space();
@@ -313,11 +319,6 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 		};
 		CompilationPipeline.assemblyCompilationFinished += OnCompilationFinished;
 		BuildPipeline.BuildPlayer(buildPlayerOptions);
-	}
-	
-	// [PropertySpace(10), OnInspectorGUI, PropertyOrder(4), HorizontalGroup("TryBuild"), ShowIf("@canPush")]
-	private void BuildResult() {
-		EditorUtilities.DrawBox(new Vector2(16,16), buildResult, 10);
 	}
 
 	private void OnCompilationFinished(string arg1, CompilerMessage[] arg2) {

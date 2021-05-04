@@ -12,7 +12,7 @@ public class GitCommands : ScriptableObject {
 	public string PlaytestBranch => playtestBranch;
 	[SerializeField] private string playtestBranch = "playtest";
 
-	public string[] Branches => new[] {buildBranch, playtestBranch};
+	public string[] Branches => new[] { playtestBranch, buildBranch };
 	
 	// [InfoBox("Use {push_branch} and {authorized_branch} labels in commands instead of branch names")]
 	public string[] list = {
