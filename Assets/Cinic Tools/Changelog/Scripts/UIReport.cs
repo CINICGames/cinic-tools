@@ -24,6 +24,7 @@ namespace Changelog {
 
 		private IEnumerator Report() {
 			screenshot = default;
+			
 			// Screenshot
 			if (screenshotToggle.isOn) {
 				yield return TakeScreenshot();
@@ -31,11 +32,9 @@ namespace Changelog {
 			canvasGroup.interactable = false;
 			sendingFrameCanvas.Show(true);
 			
-			// Discord
-			yield return RestClient.Instance.SendDiscordReport(title.text, description.text, screenshotToggle.isOn ? screenshot : null);
-			
-			// HackNPlan
-			yield return RestClient.Instance.CreateReportTask(title.text, description.text, screenshotToggle.isOn ? screenshot : null);
+			// Send Report
+			yield return RestClient.Instance.SendReportReactions(title.text, description.text, screenshotToggle.isOn ? screenshot : null);
+
 			sendingFrameCanvas.Show(false);
 			sentFrameCanvas.Show(true);
 		}
@@ -60,6 +59,5 @@ namespace Changelog {
 			canvasGroup.interactable = true;
 			sentFrameCanvas.Show(false);
 		}
-		
 	}
 }

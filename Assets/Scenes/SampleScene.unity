@@ -131,6 +131,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4268091740947236053, guid: 717a7f6fd661e0143b27ca4a7a5d7bf6,
+        type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4268091741436264266, guid: 717a7f6fd661e0143b27ca4a7a5d7bf6,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -255,6 +260,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Canvas Changelog
+      objectReference: {fileID: 0}
+    - target: {fileID: 4268091741913050109, guid: 717a7f6fd661e0143b27ca4a7a5d7bf6,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 717a7f6fd661e0143b27ca4a7a5d7bf6, type: 3}
@@ -496,6 +506,40 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1927834788461685850, guid: fac541768e5376b4491041ffcfe4d447,
+        type: 3}
+      propertyPath: logAddons.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927834788461685850, guid: fac541768e5376b4491041ffcfe4d447,
+        type: 3}
+      propertyPath: logAddons.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 34ed07327b5ba97468ba03812bc3cb3e,
+        type: 2}
+    - target: {fileID: 1927834788461685850, guid: fac541768e5376b4491041ffcfe4d447,
+        type: 3}
+      propertyPath: logAddons.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: b51f46986e2ea314c8098b53964104e4,
+        type: 2}
+    - target: {fileID: 1927834788461685850, guid: fac541768e5376b4491041ffcfe4d447,
+        type: 3}
+      propertyPath: reportAddons.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927834788461685850, guid: fac541768e5376b4491041ffcfe4d447,
+        type: 3}
+      propertyPath: reportAddons.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 76812454538cbea4f8465e9de07f10a5,
+        type: 2}
+    - target: {fileID: 1927834788461685850, guid: fac541768e5376b4491041ffcfe4d447,
+        type: 3}
+      propertyPath: reportAddons.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: ef52fc0c991a23049b5e77872b466fae,
+        type: 2}
     - target: {fileID: 1927834788461685851, guid: fac541768e5376b4491041ffcfe4d447,
         type: 3}
       propertyPath: m_Name
