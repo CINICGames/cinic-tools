@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CinicGames.Tools.Utilities;
 using UnityEngine;
 
 namespace Changelog {

@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
+
+namespace CinicGames.Tools.Utilities {
 
 	public static class UIUtility {
 		public static void Clear(Transform transform) {
@@ -38,10 +41,12 @@ using Object = UnityEngine.Object;
 				var button = newObject.GetComponent<Button>();
 				if (button) {
 					button.onClick.RemoveAllListeners();
-					button.onClick.AddListener(new UnityEngine.Events.UnityAction(onClick));
+					button.onClick.AddListener(new UnityAction(onClick));
 				}
 			}
 			return newObject;
 		}
 
 	}
+
+}

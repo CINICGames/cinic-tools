@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CinicGames.Tools.Utilities;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "hacknplan_data", menuName = "Data/QA/Hacknplan Data")]
