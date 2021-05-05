@@ -80,6 +80,7 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 	private void Init() {
 		string commandsPath = Path.Combine(CommandsLocation, CommandsFileName);
 		commands = AssetDatabase.LoadAssetAtPath<GitCommands>(commandsPath);
+		
 		// If no asset found create it
 		if (commands == null) {
 			commands = CreateInstance<GitCommands>();
@@ -91,6 +92,7 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 		
 		branch = commands.PlaytestBranch;
 		UpdateReferences();
+		FixVersion();
 		commitMessage = $"Version Upgrade: {VersionPreview()}";
 	}
 
@@ -161,6 +163,19 @@ public class GitWindow : EditorWindow, IPostBuildPlayerScriptDLLs {
 		currentBranch = Git.GetCurrentBranchName();
 		manualVersion = VersionPreview();
 		canPush = CheckIfCanPush(out dynamicTitle);
+	}
+	
+	private void FixVersion() {
+		if (!ValidateVersion(PlayerSettings.bundleVersion)) {
+			string[] versionParts = PlayerSettings.bundleVersion.Split('.');
+		
+			// Get version if valid, fix it otherwise
+			int major = versionParts.Length > 0 ? Convert.ToInt32(versionParts[0]) : 0;
+			int minor = versionParts.Length > 1 ? Convert.ToInt32(versionParts[1]) : 0;
+			int patch = versionParts.Length > 2 ? Convert.ToInt32(versionParts[2]) : 0;
+		
+			PlayerSettings.bundleVersion = $"{major}.{minor}.{patch}";
+		}
 	}
 
 	private bool CheckIfCanPush(out string titleText) {
