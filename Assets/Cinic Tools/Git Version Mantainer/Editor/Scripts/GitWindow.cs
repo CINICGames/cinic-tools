@@ -176,7 +176,7 @@ namespace CinicGames.Tools.Git {
 			return true;
 		}
 
-		public void Execute() {
+		private void Execute() {
 			if (!EditorUtility.DisplayDialog("Tested build", "Have you tried to manually build?", "Yes", "No")) {
 				return;
 			}
@@ -234,7 +234,7 @@ namespace CinicGames.Tools.Git {
 			return x;
 		}
 
-		public void ManualVersionChange() {
+		private void ManualVersionChange() {
 			if (ValidateVersion(manualVersion)) {
 				PlayerSettings.bundleVersion = manualVersion;
 				UpdateReferences();
@@ -268,17 +268,22 @@ namespace CinicGames.Tools.Git {
 		}
 
 		private void ValidateBranch(int toValidate) {
-			if (commands.Branches[toValidate] == commands.BuildBranch) {
-				if (EditorUtility.DisplayDialog("Push Official Build",
-					$"Confirm you want to push in {commands.BuildBranch} branch?",
-					"Ok", "No")) {
-					branch = commands.BuildBranch;
-					selectedIndex = 1;
-					return;
-				}
+			if (commands.Branches[toValidate] != commands.BuildBranch) {
 				branch = commands.PlaytestBranch;
 				selectedIndex = 0;
+				return;
 			}
+
+			if (EditorUtility.DisplayDialog("Push Official Build",
+				$"Confirm you want to push in {commands.BuildBranch} branch?",
+				"Ok", "No")) {
+				branch = commands.BuildBranch;
+				selectedIndex = 1;
+				return;
+			}
+			branch = commands.PlaytestBranch;
+			selectedIndex = 0;
+
 		}
 
 		private string VersionPreview() {
