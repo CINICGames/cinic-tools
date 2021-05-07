@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Cinic Tools/Discord Reporter/Scenes/Sample.unity
+    guid: 409588b148040d54d991f722d3b509b0
   m_configObjects: {}

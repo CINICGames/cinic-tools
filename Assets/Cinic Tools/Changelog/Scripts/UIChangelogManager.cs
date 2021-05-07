@@ -22,7 +22,7 @@ namespace Changelog {
 		private static UIChangelogManager instance;
 		public static UIChangelogManager Instance => instance;
 		[SerializeField] private UIChangelog changelog = default;
-		[SerializeField] private UIReport report = default;
+		// [SerializeField] private UIReport report = default;
 		[SerializeField] private KeyCode key = default;
 		public CanvasGroup canvasGroup = default;
 		public TMP_Text closeText;
@@ -85,12 +85,12 @@ namespace Changelog {
 		}
 
 		private void OnHide() {
-			report.Clear();
+			// report.Clear();
 			changelog.Clear();
 		}
 
 		public void ShowView(GameObject obj) {
-			report.Show(obj == report.gameObject);
+			// report.Show(obj == report.gameObject);
 			changelog.Show(obj == changelog.gameObject);
 		}
 	}

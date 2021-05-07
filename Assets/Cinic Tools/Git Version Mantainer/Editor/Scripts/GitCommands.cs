@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace CinicGames.Tools.Git {
 
-	[CreateAssetMenu(menuName = "Data/Git/Commands", fileName = "git_commands")]
+	[CreateAssetMenu(menuName = "Cinic Tools/Git/Commands", fileName = "GitCommands")]
 	public class GitCommands : ScriptableObject {
 
 		public string AuthorizedBranch => authorizedBranch;
