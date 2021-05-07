@@ -1,17 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using CinicTools.Tools.Utilities;
 using UnityEngine;
 
-namespace CinicTools.DiscordReporter {
+namespace CinicTools.Tools.DiscordReporter {
 
 	public class DiscordReporter : MonoBehaviour {
 		private static DiscordReporter instance;
 
-		public string discordWebhook;
+		[SerializeField] private string discordWebhook;
 		[Space]
-		public List<LogType> reportedLogTypes = new List<LogType> { LogType.Assert, LogType.Error, LogType.Exception };
-		public string[] ignoredMessages = new string[0];
+		[SerializeField] private List<LogType> reportedLogTypes = new List<LogType> { LogType.Assert, LogType.Error, LogType.Exception };
+		[SerializeField] private string[] ignoredMessages = new string[0];
 		[Space]
 		public bool autoReport = true;
 
@@ -20,6 +20,7 @@ namespace CinicTools.DiscordReporter {
 		private void Awake() {
 			#if !DEBUG
 			Destroy(gameObject);
+			return;
 			#endif
 
 			if (instance != null) {
@@ -49,14 +50,15 @@ namespace CinicTools.DiscordReporter {
 
 		#endregion
 		
-		private void OnLogReceived(string condition, string stacktrace, LogType type) {
+		private void OnLogReceived(string message, string stacktrace, LogType type) {
 			if (!Application.isEditor && autoReport) {
 				if (reportedLogTypes.Contains(type)) {
 					// Don't spam duplicate messages, ignore some useless ones
-					if (!oldErrors.Contains(stacktrace) && !ignoredMessages.Any(condition.Contains)) {
+					if (!oldErrors.Contains(stacktrace) && !ignoredMessages.Any(message.Contains)) {
 						oldErrors.Add(stacktrace);
-						string content = DiscordAPI.GetReport(condition, stacktrace, type);
-						StartCoroutine(DiscordAPI.SendDiscordReport(discordWebhook, content));
+						string content = RestAPI.FormatDiscordContent(message, stacktrace, type);
+						byte[] screenshot = ScreenCapture.CaptureScreenshotAsTexture().EncodeToPNG();
+						StartCoroutine(RestAPI.SendReport(discordWebhook, content, screenshot));
 					}
 				}
 			}
