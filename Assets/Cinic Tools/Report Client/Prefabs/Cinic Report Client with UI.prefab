@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 2931230654692479620}
   - component: {fileID: 2522947752474310746}
   m_Layer: 0
-  m_Name: Cinic Report Utility
+  m_Name: Cinic Report Client with UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
