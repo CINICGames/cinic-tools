@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed7b84ab9b4441a39d34e131b531e6de, type: 3}
   m_Name: discord_data
   m_EditorClassIdentifier: 
-  webhook: https://discord.com/api/webhooks/840139260748890133/n3VToiP4XgRrNJ7XSw6v3Qbw1QN6v9acVcStYl-pRDHJFXKmJf-IBZN9O7FQqXmMIeaw
+  webhook:
