@@ -734,6 +734,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afc1df69ee3ea334cb0d99f055a53bdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  openCloseKey: 293
   title: {fileID: 8688141455878859364}
   description: {fileID: 8688141454867376646}
   screenshotToggle: {fileID: 8688141455199133984}

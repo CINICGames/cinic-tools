@@ -8,12 +8,15 @@ using UnityEngine.UI;
 namespace CinicGames.Tools.Report {
 	[RequireComponent(typeof(CanvasGroup))]
 	public class UIReport : MonoBehaviour {
+		[SerializeField] private KeyCode openCloseKey = default;
+
 		[SerializeField] private TMP_InputField title = default;
 		[SerializeField] private TMP_InputField description = default;
 		[SerializeField] private Toggle screenshotToggle = default;
 		[Space]
 		[SerializeField] private CanvasGroup sendingFrameCanvas = default;
 		[SerializeField] private CanvasGroup sentFrameCanvas = default;
+		
 
 		private CanvasGroup canvasGroup;
 		
@@ -25,21 +28,26 @@ namespace CinicGames.Tools.Report {
 		public event Action OnScreenshotTake;
 
 		/// <summary>
-		/// Invoked after taking a screnshot
+		/// Invoked after taking a screenshot
 		/// </summary>
 		public event Action AfterScreenshotTake;
 		
 		private void Awake() {
 			canvasGroup = GetComponent<CanvasGroup>();
 		}
+		
+		private void Update() {
+			if (Input.GetKeyDown(openCloseKey)) 
+				Show(canvasGroup.alpha == 0);
+		}
 
 		public void Show(bool value) {
 			canvasGroup.Show(value);
+			if(!value)
+				Clear();
 		}
 
-		public void SendReport() {
-			StartCoroutine(Report());
-		}
+		public void SendReport() => StartCoroutine(Report());
 
 		private IEnumerator Report() {
 			screenshot = default;
@@ -55,7 +63,7 @@ namespace CinicGames.Tools.Report {
 			sendingFrameCanvas.Show(true);
 			
 			// Send Report
-			yield return CinicReportClient.Instance.SendReportReactions(title.text, description.text, screenshotToggle.isOn ? screenshot : null);
+			yield return CinicReportClient.Singleton.SendReportReactions(title.text, description.text, screenshotToggle.isOn ? screenshot : null);
 
 			sendingFrameCanvas.Show(false);
 			sentFrameCanvas.Show(true);
@@ -68,11 +76,10 @@ namespace CinicGames.Tools.Report {
 			Show(true);
 			yield return new WaitForEndOfFrame();
 		}
-		
-		public void Clear() {
+
+		private void Clear() {
 			title.text = string.Empty;
 			description.text = string.Empty;
-			screenshotToggle.isOn = true; 
 		}
 
 		public void ClosePopup() {
