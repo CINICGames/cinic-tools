@@ -1,10 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GoogleSheetsToUnity;
-using UnityEngine;
 
-namespace Changelog {
-	public class ChangelogParser {
+namespace CinicGames.Tools.Changelog {
+	public class Log {
+		public int row;
+		public bool check;
+		public string log;
+		public string cellRef;
+
+		public override string ToString() {
+			return $"[{row}], [{check}], [{log}]";
+		}
+	}
+	
+	public static class ChangelogParser {
 		private static GstuSpreadSheet sheet;
 		public static bool Initialized {
 			get => sheet != null;
@@ -16,7 +25,7 @@ namespace Changelog {
 		public static void SetSheet(string id, string sheetName) {
 			sheetID = id;
 			worksheet = sheetName;
-			SpreadsheetManager.Read(new GSTU_Search(sheetID, worksheet), s=>sheet=s, false);
+			SpreadsheetManager.Read(new GSTU_Search(sheetID, worksheet), s=>sheet=s);
 		}
 
 		public static Dictionary<string, List<Log>> GetLogs() {

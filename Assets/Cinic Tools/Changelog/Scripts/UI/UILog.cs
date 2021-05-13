@@ -2,21 +2,20 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Changelog {
+namespace CinicGames.Tools.Changelog {
 	public class UILog : MonoBehaviour {
 		[SerializeField] private Toggle toggle = default;
-		[SerializeField] private TextMeshProUGUI description = default;
+		[SerializeField] private TMP_Text description = default;
 		private Log log;
-		public Log Log => log;
 		
-		public void Set(Log log) {
-			if (log == null || log.log == string.Empty) {
+		public void Set(Log newLog) {
+			if (newLog == null || newLog.log == string.Empty) 
 				Destroy(gameObject);
-			}
+			
 			toggle.onValueChanged.RemoveAllListeners();
-			this.log = log;
-			toggle.isOn = log.check;
-			description.text = log.log;
+			log = newLog;
+			toggle.isOn = newLog.check;
+			description.text = newLog.log;
 			toggle.onValueChanged.AddListener(OnChecked);
 		}
 
