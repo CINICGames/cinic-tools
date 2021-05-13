@@ -9,6 +9,7 @@ namespace CinicGames.Tools.Report.HackNPlan {
 		public override IEnumerator React(string msg, string stack, LogType logType, byte[] screenshot) {
 			var task = new HackNPlanData.Task
 			{
+				projectId = hackNPlanData.ProjectId,
 				boardId = int.Parse(hackNPlanData.BoardId),
 				title = $"v{Application.version} - {msg}",
 				description = "-----\n" +

@@ -44,7 +44,7 @@ public class CinicReportClient : MonoBehaviour {
 		}
 	}
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if DEVELOPMENT_BUILD
 
 	private void OnEnable() {
 		Application.logMessageReceived += HandleLog;
@@ -61,7 +61,7 @@ public class CinicReportClient : MonoBehaviour {
 	#region Methods
 
 	private void HandleLog(string msg, string stack, LogType type) {
-		if (!Application.isEditor && enableLogErrorsReaction) {
+		if (enableLogErrorsReaction) {
 			if (AllowedLogTypes.Contains(type)) {
 				// Don't spam duplicate messages, ignore some useless ones
 				if (!LastErrors.Contains(stack) && !FilteredMessages.Any(msg.Contains)) {

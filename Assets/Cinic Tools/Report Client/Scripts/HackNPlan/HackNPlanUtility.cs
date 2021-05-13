@@ -22,8 +22,10 @@ namespace CinicGames.Tools.Report.HackNPlan {
 				var newTask = (HackNPlanData.Task)JsonUtility.FromJson(www.downloadHandler.text, typeof(HackNPlanData.Task));
 				// attachment
 				yield return new WaitForEndOfFrame();
-				var client = new RestSharp.RestClient($"https://api.hacknplan.com/v0/projects/{newTask.projectId}/workitems/{newTask.workItemId}/attachments");
-				client.Timeout = -1;
+				var client = new RestClient($"https://api.hacknplan.com/v0/projects/{newTask.projectId}/workitems/{newTask.workItemId}/attachments")
+				{
+					Timeout = -1
+				};
 				var request = new RestRequest(Method.POST);
 				request.AddHeader("Content-Type", "multipart/form-data");
 				request.AddHeader("Authorization", $"ApiKey {data.ApiKey}");
