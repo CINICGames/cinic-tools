@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 #if UNITY_EDITOR
 using UnityEditor;
 using System.Reflection;
@@ -14,8 +16,35 @@ using Random = UnityEngine.Random;
 namespace CinicGames.Tools.Utilities {
 
 	public static class Extensions {
+	
+	    #region Object
+	    
+	    //NOTE: You need add [Serializable] attribute in your class to enable serialization
+	    public static byte[] Serialize(this object obj) {
+		    if (obj == null)
+			    return null;
 
-		#region GameObject
+		    var bf = new BinaryFormatter();
+		    using var ms = new MemoryStream();
+		    bf.Serialize(ms, obj);
+		    return ms.ToArray();
+	    }
+
+	    public static T Deserialize<T>(this byte[] bytes) where T : class {
+		    if (bytes == null)
+			    return null;
+
+		    using var memStream = new MemoryStream();
+		    var binForm = new BinaryFormatter();
+		    memStream.Write(bytes, 0, bytes.Length);
+		    memStream.Seek(0, SeekOrigin.Begin);
+		    var obj = (T)binForm.Deserialize(memStream);
+		    return obj;
+	    }
+	    
+	    #endregion
+
+	    #region GameObject
 
 		public static void DestroyChildren(this GameObject obj) {
 			foreach (Transform child in obj.transform) {

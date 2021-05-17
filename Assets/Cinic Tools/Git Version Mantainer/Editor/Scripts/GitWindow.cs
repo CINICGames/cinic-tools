@@ -50,10 +50,9 @@ namespace CinicGames.Tools.Git {
 		public int callbackOrder => 0;
 		private Color buildResult = Color.yellow;
 
-		[MenuItem("Tools/Git/Update Playtest #p")]
+		[MenuItem("Tools/Git/Version Maintainer #v")]
 		private static void OpenWindow() {
-			var window = GetWindow<GitWindow>();
-			// window.position = GUIHelper.GetEditorWindowRect().AlignCenter(500, 240);
+			var window = GetWindow<GitWindow>("Version Maintainer");
 			window.Init();
 			window.minSize = WindowSize;
 			window.maxSize = WindowSize;
@@ -312,12 +311,12 @@ namespace CinicGames.Tools.Git {
 			return $"{major}.{minor}.{patch}";
 		}
 
-		public void TryBuild() {
+		private void TryBuild() {
 			enabled = true;
 			EditorUtility.DisplayProgressBar("Try Build", "Trying to build", 0);
 			var buildPlayerOptions = new BuildPlayerOptions
 			{
-				scenes = new[] {"Assets/Scenes/Test/git_test_build.unity"},
+				scenes = new string[0],
 				locationPathName = "Build",
 				target = BuildTarget.StandaloneWindows,
 				options = BuildOptions.BuildScriptsOnly
@@ -330,30 +329,29 @@ namespace CinicGames.Tools.Git {
 			if (arg2.ToList().Exists(m => m.type == CompilerMessageType.Error)) {
 				CompilationPipeline.assemblyCompilationFinished -= OnCompilationFinished;
 				EditorUtility.DisplayDialog("Build Result", "Scripts building fail, fix errors before updating Playtest", "OK");
+				EditorUtility.ClearProgressBar();
 				buildResult = Color.red;
-			} else if (arg1.Contains("Assembly-CSharp.")) {
+			} 
+			else if (arg1.Contains("Assembly-CSharp.")) {
 				CompilationPipeline.assemblyCompilationFinished -= OnCompilationFinished;
 				buildResult = Color.green;
 				enabled = false;
 				EditorUtility.DisplayDialog("Build Result", "Scripts built correctly, you can update Playtest", "OK");
+				EditorUtility.ClearProgressBar();
 				throw new BuildFailedException("Building canceled, NO Compilation ERRORS");
 			}
 		}
 
 		public void OnPostBuildPlayerScriptDLLs(BuildReport report) {
-			if (!enabled) {
+			if (!enabled)
 				return;
-			}
-
+			
 			enabled = false;
 			CompilationPipeline.assemblyCompilationFinished -= OnCompilationFinished;
 			buildResult = Color.green;
 			EditorUtility.DisplayDialog("Build Result", "Scripts built correctly, you can update Playtest", "OK");
+			EditorUtility.ClearProgressBar();
 			throw new BuildFailedException("Building canceled, NO Compilation ERRORS");
-		}
-
-		private Color GetColor() {
-			return branch == commands.BuildBranch ? Color.red : Color.white;
 		}
 	}
 
